@@ -3,10 +3,8 @@ Database configuration and setup
 यहाँ database से connect करते हैं
 """
 
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy.pool import NullPool
 import os
 from dotenv import load_dotenv
 import logging
@@ -22,7 +20,10 @@ DATABASE_URL = os.getenv(
 )
 
 # Async URL (PostgreSQL के लिए asyncpg driver)
-ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+ASYNC_DATABASE_URL = DATABASE_URL.replace(
+    "postgresql://",
+    "postgresql+asyncpg://"
+)
 
 # Database engine बनाएं
 # Echo=true = SQL queries को console में दिखाएगा
@@ -32,8 +33,7 @@ engine = create_async_engine(
     future=True,
     pool_pre_ping=True,
     pool_size=20,
-    max_overflow=10,
-    poolclass=NullPool
+    max_overflow=10
 )
 
 # Session बनाने का factory
@@ -48,11 +48,12 @@ AsyncSessionLocal = sessionmaker(
 # Base class सभी models के लिए
 Base = declarative_base()
 
+
 # FastAPI में हर endpoint को database session देने के लिए
 async def get_db() -> AsyncSession:
     """
     Dependency: FastAPI को हर request में database session देगा
-    
+
     Usage:
     @app.get("/items")
     async def get_items(db: AsyncSession = Depends(get_db)):
@@ -68,6 +69,7 @@ async def get_db() -> AsyncSession:
         finally:
             await session.close()
 
+
 # पहली बार जब app start हो तो tables बनाएं
 async def init_db():
     """
@@ -77,6 +79,8 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
         logger.info("✅ Database tables created/verified")
 
+
+# App shutdown के समय database connection बंद करें
 async def close_db():
     """
     App shutdown के समय database connection बंद करें

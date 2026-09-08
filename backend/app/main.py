@@ -5,6 +5,7 @@ Main FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import auth
+from app.database import init_db, close_db
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Health Check
 @app.get("/api/health")
 async def health_check():
@@ -44,6 +46,7 @@ async def health_check():
         "version": "1.0.0"
     }
 
+
 @app.get("/")
 async def root():
     return {
@@ -52,20 +55,38 @@ async def root():
         "openapi": "/api/openapi.json"
     }
 
+
 # Include routers
 app.include_router(auth.router, prefix="/api", tags=["Authentication"])
 
-# Startup/Shutdown events
+
+# Startup
 @app.on_event("startup")
 async def startup_event():
     logger.info("🚀 IntelliFlow API starting up...")
 
+    try:
+        await init_db()
+        logger.info("✅ Database initialized successfully")
+    except Exception as e:
+        logger.error(f"❌ Database initialization failed: {e}")
+        raise
+
+
+# Shutdown
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("👋 IntelliFlow API shutting down...")
 
+    try:
+        await close_db()
+    except Exception as e:
+        logger.error(f"❌ Database shutdown error: {e}")
+
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
