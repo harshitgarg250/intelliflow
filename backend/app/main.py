@@ -1,27 +1,25 @@
 """
 Main FastAPI Application
-यहाँ से सब कुछ start होता है
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes import auth
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# FastAPI app instance बनाएं
 app = FastAPI(
     title="IntelliFlow",
     description="🤖 AI Agent Management Platform - Orchestrate intelligent workflows effortlessly",
     version="1.0.0",
-    docs_url="/api/docs",        # Swagger UI
-    redoc_url="/api/redoc",      # ReDoc
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
     openapi_url="/api/openapi.json"
 )
 
-# CORS Setup
-# Frontend अलग port पर है (3000 या 5173), तो CORS चाहिए
+# CORS Middleware
 origins = [
     "http://localhost:3000",
     "http://localhost:5173",
@@ -37,37 +35,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Health Check - यह बताता है कि API alive है
+# Health Check
 @app.get("/api/health")
 async def health_check():
-    """
-    Simple health check endpoint
-    Frontend इसे ping करके देखता है कि backend चल रहा है या नहीं
-    """
     return {
         "status": "healthy",
         "app_name": "IntelliFlow",
         "version": "1.0.0"
     }
 
-# Root endpoint
 @app.get("/")
 async def root():
-    """
-    Root path पर welcome message
-    """
     return {
         "message": "Welcome to IntelliFlow",
         "docs": "/api/docs",
         "openapi": "/api/openapi.json"
     }
 
-# App startup event
+# Include routers
+app.include_router(auth.router, prefix="/api", tags=["Authentication"])
+
+# Startup/Shutdown events
 @app.on_event("startup")
 async def startup_event():
     logger.info("🚀 IntelliFlow API starting up...")
 
-# App shutdown event
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("👋 IntelliFlow API shutting down...")
