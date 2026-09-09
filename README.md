@@ -4,212 +4,119 @@ A full-stack web application for orchestrating multi-agent workflows with real-t
 
 ## Features
 
-✨ **Agent Management**
-- Create and manage AI agents with custom roles and skills
-- Configure LLM models and tools for each agent
-- Real-time agent status tracking
-
-📋 **Task Management**
-- Assign tasks to agents
-- Priority-based task execution
-- Task status and history tracking
-
-🔄 **Workflow Orchestration**
-- Design multi-agent workflows
-- Sequential task execution
-- Cross-agent data passing
-
-📊 **Real-time Dashboard**
-- Live execution monitoring
-- Performance metrics and analytics
-- Detailed execution logs
-
-🔐 **Authentication**
-- Secure JWT-based authentication
-- User account management
-- Password security with bcrypt
+✨ **Agent Management** - Create and manage AI agents with custom roles and skills
+📋 **Task Management** - Assign tasks to agents with priority and status tracking
+🔄 **Workflow Orchestration** - Design multi-agent workflows with sequential execution
+📊 **Real-time Dashboard** - Live execution monitoring with performance metrics
+🔐 **Authentication** - Secure JWT-based authentication with user management
 
 ## Tech Stack
 
-**Backend**
-- FastAPI (Python web framework)
-- SQLAlchemy (ORM)
-- PostgreSQL (Database)
-- JWT (Authentication)
-
-**Frontend**
-- React 18 (UI Framework)
-- TypeScript (Type safety)
-- Tailwind CSS (Styling)
-- Zustand (State management)
-
-**Deployment**
-- Docker & Docker Compose
-- PostgreSQL 15
-- Redis (Caching)
+**Backend:** FastAPI, SQLAlchemy, PostgreSQL, JWT, Python 3.11+
+**Frontend:** React 18, TypeScript, Tailwind CSS (Coming soon)
+**Deployment:** Docker & Docker Compose
 
 ## Quick Start
 
 ### Prerequisites
-
 - Python 3.11+
-- Node.js 18+
 - Docker & Docker Compose
 - Git
 
 ### Setup
 
-1. **Clone the repository**
 ```bash
-   git clone https://github.com/YOUR_USERNAME/intelliflow.git
-   cd intelliflow
+# Clone repository
+git clone https://github.com/YOUR_USERNAME/intelliflow.git
+cd intelliflow
+
+# Start Docker services
+docker-compose up -d
+
+# Install dependencies
+cd backend
+pip install -r requirements.txt
+
+# Run backend
+python app/main.py
 ```
 
-2. **Start Docker services**
-```bash
-   docker-compose up -d
-```
-
-3. **Install backend dependencies**
-```bash
-   cd backend
-   pip install -r requirements.txt
-```
-
-4. **Run the backend**
-```bash
-   python app/main.py
-```
-
-   Backend will be available at: http://localhost:8000
-   API Docs: http://localhost:8000/api/docs
-
-5. **Setup frontend**
-```bash
-   cd ../frontend
-   npm install
-   npm run dev
-```
-
-   Frontend will be available at: http://localhost:5173
+Backend: http://localhost:8000
+API Docs: http://localhost:8000/api/docs
 
 ## API Endpoints
 
-### Authentication
+### Auth
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 
-### Agents (Coming soon)
+### Agents
 - `GET /api/agents/` - List all agents
 - `POST /api/agents/` - Create agent
 - `GET /api/agents/{id}` - Get agent details
 - `PUT /api/agents/{id}` - Update agent
 - `DELETE /api/agents/{id}` - Delete agent
 
-### Tasks (Coming soon)
-- `GET /api/tasks/` - List tasks
+### Tasks
+- `GET /api/tasks/` - List all tasks
 - `POST /api/tasks/` - Create task
+- `GET /api/tasks/{id}` - Get task details
 - `PUT /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
 
-### Workflows (Coming soon)
-- `GET /api/workflows/` - List workflows
-- `POST /api/workflows/` - Create workflow
-- `POST /api/workflows/{id}/execute` - Execute workflow
+## Testing
 
-## Project Structure
-intelliflow/
-├── backend/
-│ ├── app/
-│ │ ├── api/
-│ │ │ └── routes/
-│ │ │ └── auth.py
-│ │ ├── models/
-│ │ │ ├── user.py
-│ │ │ ├── agent.py
-│ │ │ └── task.py
-│ │ ├── schemas/
-│ │ │ ├── user.py
-│ │ │ └── agent.py
-│ │ ├── core/
-│ │ │ └── security.py
-│ │ ├── main.py
-│ │ └── database.py
-│ ├── requirements.txt
-│ └── .env
-├── frontend/
-│ ├── src/
-│ ├── package.json
-│ └── vite.config.ts
-├── docker-compose.yml
-└── README.md
-## Development
-
-### Testing the API
-
-1. **Health check**
 ```bash
-   curl http://localhost:8000/api/health
+# Register
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "harshit",
+    "email": "harshit@example.com",
+    "password": "HarshitPass123!"
+  }'
+
+# Login
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "harshit@example.com",
+    "password": "HarshitPass123!"
+  }'
+
+# Create Agent (replace TOKEN with access_token from login)
+curl -X POST http://localhost:8000/api/agents/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "name": "Data Analyst",
+    "role": "Senior Data Analyst",
+    "goal": "Analyze data and provide insights",
+    "backstory": "10 years of data science experience",
+    "tools": ["python", "sql", "pandas"]
+  }'
+
+# List Agents
+curl http://localhost:8000/api/agents/ \
+  -H "Authorization: Bearer TOKEN"
 ```
 
-2. **Register user**
-```bash
-   curl -X POST http://localhost:8000/api/auth/register \
-     -H "Content-Type: application/json" \
-     -d '{
-       "username": "testuser",
-       "email": "test@example.com",
-       "password": "TestPass123!"
-     }'
-```
+## Project Status
 
-3. **Login**
-```bash
-   curl -X POST http://localhost:8000/api/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{
-       "email": "test@example.com",
-       "password": "TestPass123!"
-     }'
-```
-
-## Database
-
-PostgreSQL is used for data persistence. Database schema includes:
-- Users (authentication)
-- Agents (AI agent definitions)
-- Tasks (work assignments)
-- Workflows (orchestration)
-- Executions (run history)
-- Logs (detailed tracking)
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Write clear commit messages
-4. Push to your fork
-5. Create a Pull Request
+✅ Day 1: Backend setup + Authentication
+✅ Day 2: Agent & Task APIs
+⏳ Day 3: Workflow Engine
+⏳ Day 4: React Frontend
+⏳ Day 5: Polish & Deployment
 
 ## License
 
-MIT License
+MIT
 
 ## Author
 
 Harshit Garg (harshitgarg250)
 
-## Project Timeline
-
-- **Day 1**: Backend setup ✅
-- **Day 2**: Agent & Task APIs
-- **Day 3**: Workflow execution
-- **Day 4**: React Frontend
-- **Day 5**: Polish & Deployment
-
-## Support
-
-For issues and questions, open an issue on GitHub.
-
 ---
 
-Built with ❤️ as a portfolio project demonstrating full-stack development skills.
+Built as a portfolio project demonstrating full-stack development skills.

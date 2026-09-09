@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="IntelliFlow",
-    description="🤖 AI Agent Management Platform",
+    description="🤖 AI Agent Management Platform - Orchestrate intelligent workflows effortlessly",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
