@@ -1,7 +1,3 @@
-"""
-API routes
-"""
+from . import auth, agents, tasks
 
-from . import auth
-
-__all__ = ["auth"]
+__all__ = ["auth", "agents", "tasks"]
